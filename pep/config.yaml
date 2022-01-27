@@ -1,7 +1,7 @@
 pep_version: 2.0.0
-sample_table: "test_samples.csv"
+sample_table: "CarD_samples.csv"
 sample_modifiers:
     derive:
         attributes: [file_path]
         sources:
-            source1: "test/"
+            source1: "/mnt/rdrive/rlandick/General/HTSeq/2021/mbwolfe/2021_12_CarD_zymo_ChIP/"

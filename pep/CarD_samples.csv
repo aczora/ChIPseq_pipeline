@@ -1,0 +1,18 @@
+sample_name,filenameR1,filenameR2,file_path,input_sample,genotype,genome,macs2_params
+3898_A_IPTG_beta,3898_A_IPTG_beta_S100_L004_R1_001.fastq.gz,3898_A_IPTG_beta_S100_L004_R2_001.fastq.gz,source1,3898_A_IPTG_Input,IPTG,ZM4,-f BAMPE --broad
+3898_A_IPTG_HA,3898_A_IPTG_HA_S101_L004_R1_001.fastq.gz,3898_A_IPTG_HA_S101_L004_R2_001.fastq.gz,source1,3898_A_IPTG_Input,IPTG,ZM4,-f BAMPE --broad
+3898_A_IPTG_Input,3898_A_IPTG_Input_S102_L004_R1_001.fastq.gz,3898_A_IPTG_Input_S102_L004_R2_001.fastq.gz,source1,,IPTG,ZM4,
+3898_A_IPTG_sigma,3898_A_IPTG_sigma_S103_L004_R1_001.fastq.gz,3898_A_IPTG_sigma_S103_L004_R2_001.fastq.gz,source1,3898_A_IPTG_Input,IPTG,ZM4,-f BAMPE --broad
+3898_A_noIPTG_beta,3898_A_noIPTG_beta_S104_L004_R1_001.fastq.gz,3898_A_noIPTG_beta_S104_L004_R2_001.fastq.gz,source1,3898_A_noIPTG_Input,noIPTG,ZM4,-f BAMPE --broad
+3898_A_noIPTG_HA,3898_A_noIPTG_HA_S105_L004_R1_001.fastq.gz,3898_A_noIPTG_HA_S105_L004_R2_001.fastq.gz,source1,3898_A_noIPTG_Input,noIPTG,ZM4,-f BAMPE --broad
+3898_A_noIPTG_Input,3898_A_noIPTG_Input_S106_L004_R1_001.fastq.gz,3898_A_noIPTG_Input_S106_L004_R2_001.fastq.gz,source1,,noIPTG,ZM4,
+3898_A_noIPTG_sigma,3898_A_noIPTG_sigma_S107_L004_R1_001.fastq.gz,3898_A_noIPTG_sigma_S107_L004_R2_001.fastq.gz,source1,3898_A_noIPTG_Input,noIPTG,ZM4,-f BAMPE --broad
+3898_B_IPTG_beta,3898_B_IPTG_beta_S108_L004_R1_001.fastq.gz,3898_B_IPTG_beta_S108_L004_R2_001.fastq.gz,source1,3898_B_IPTG_Input,IPTG,ZM4,-f BAMPE --broad
+3898_B_IPTG_HA,3898_B_IPTG_HA_S109_L004_R1_001.fastq.gz,3898_B_IPTG_HA_S109_L004_R2_001.fastq.gz,source1,3898_B_IPTG_Input,IPTG,ZM4,-f BAMPE --broad
+3898_B_IPTG_Input,3898_B_IPTG_Input_S110_L004_R1_001.fastq.gz,3898_B_IPTG_Input_S110_L004_R2_001.fastq.gz,source1,,IPTG,ZM4,
+3898_B_IPTG_sigma,3898_B_IPTG_sigma_S111_L004_R1_001.fastq.gz,3898_B_IPTG_sigma_S111_L004_R2_001.fastq.gz,source1,3898_B_IPTG_Input,IPTG,ZM4,-f BAMPE --broad
+3898_B_noIPTG_beta,3898_B_noIPTG_beta_S112_L004_R1_001.fastq.gz,3898_B_noIPTG_beta_S112_L004_R2_001.fastq.gz,source1,3898_B_noIPTG_Input,noIPTG,ZM4,-f BAMPE --broad
+3898_B_noIPTG_HA,3898_B_noIPTG_HA_S113_L004_R1_001.fastq.gz,3898_B_noIPTG_HA_S113_L004_R2_001.fastq.gz,source1,3898_B_noIPTG_Input,noIPTG,ZM4,-f BAMPE --broad
+3898_B_noIPTG_Input,3898_B_noIPTG_Input_S114_L004_R1_001.fastq.gz,3898_B_noIPTG_Input_S114_L004_R2_001.fastq.gz,source1,,noIPTG,ZM4,
+3898_B_noIPTG_sigma,3898_B_noIPTG_sigma_S115_L004_R1_001.fastq.gz,3898_B_noIPTG_sigma_S115_L004_R2_001.fastq.gz,source1,3898_B_noIPTG_Input,noIPTG,ZM4,-f BAMPE --broad
+
