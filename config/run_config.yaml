@@ -25,9 +25,22 @@ reference:
             - results/alignment/process_genbank/ZM4/CP023718.1.fna
             - results/alignment/process_genbank/ZM4/CP023719.1.fna
 
-        # This allows you to mask regions by replacing them with Ns. Masked
-        # regions need to be specified by a bed file
-        masked_regions:
+    ZM4_and_bsub:
+        genbanks:
+            CP023715.1: resources/genbanks/CP023715.1.gbk
+            CP023716.1: resources/genbanks/CP023716.1.gbk
+            CP023717.1: resources/genbanks/CP023717.1.gbk
+            CP023718.1: resources/genbanks/CP023718.1.gbk
+            CP023719.1: resources/genbanks/CP023719.1.gbk
+            AL009126.3: resources/genbanks/AL009126.3.gbk
+        fastas:
+            - results/alignment/process_genbank/ZM4_and_bsub/CP023715.1.fna
+            - results/alignment/process_genbank/ZM4_and_bsub/CP023716.1.fna
+            - results/alignment/process_genbank/ZM4_and_bsub/CP023717.1.fna
+            - results/alignment/process_genbank/ZM4_and_bsub/CP023718.1.fna
+            - results/alignment/process_genbank/ZM4_and_bsub/CP023719.1.fna
+            - results/alignment/process_genbank/ZM4_and_bsub/AL009126.3.fna
+
 
 # Options to control preprocessing rules
 preprocessing:
@@ -94,7 +107,7 @@ coverage_and_norm:
     # how to normalize within a sample. Options include:
     # RPKM, CPM, BPM, RPGC, median, and SES. See deeptools manual for
     # details on these normalization methods.
-    within: median
+    within: BPM
     # drop NaNs and Infs from zero coverage in input or extracted
     # Note
     # that bigwigs will not display properly in IGV if they have nans or infs
@@ -143,37 +156,37 @@ coverage_and_norm:
     bwtools_smooth:
         param_string:
             value: "--operation 'gauss_smooth' --wsize 50 --edge 'wrap'"
-    #bwtools_spike_scale:
+    bwtools_spike_scale:
         # This controls how the spike-in regions are used to scale the
         # data when scaling to a spike-in.
         # Specify the regions to consider for the spike-in here as a bed.
         # Below is a placeholder you would want to put in your own bed here
-    #    fixed_regions:
-    #        value: "results/alignment/process_genbank/U00096.3/U00096.3.bed"
+        fixed_regions:
+            value: "resources/beds/AL009126.3_spike_in.bed"
         # What to do with the values in the spike-in sample? This sums the
         # coverage to use as a scaling factor. You could also use mean or
         # median over the regions considered.
-    #    summary_func:
-    #        value: "mean"
-    #bwtools_fixed_subtract:
+        summary_func:
+            value: "sum"
+    bwtools_fixed_subtract:
         # what regions to use as the background when doing a background
         # subtraction. This just uses all genes which is non-sensical.
         # You will want to replace with what you need
-    #    fixed_regions: 
-    #        value: "results/alignment/process_genbank/ZM4/CP023715.1.bed"
-    #bwtools_fixed_scale:
+        fixed_regions: 
+            value: "results/alignment/process_genbank/ZM4/CP023715.1.bed"
+    bwtools_fixed_scale:
         # what regions to use as the background when doing a scaling by a
         # fixed set of regions. This just uses all genes which is also
         # non-sensical. You will want to replace with what you need.
-    #    fixed_regions: 
-    #        value: "results/alignment/process_genbank/U00096.3/U00096.3.bed"
-    #bwtools_query_subtract:
+        fixed_regions: 
+            value: "results/alignment/process_genbank/ZM4/CP023715.1.bed"
+    bwtools_query_subtract:
         # What regions to consider for a dynamically chosen background subtraction
-    #    query_regions:
-    #        value: "results/alignment/process_genbank/U00096.3/U00096.3.bed"
+        query_regions:
+            value: "results/alignment/process_genbank/ZM4/CP023715.1.bed"
         # how many regions to look at?
-    #    number_of_regions:
-    #        value: 20
+        number_of_regions:
+            value: 20
     bwtools_query_scale:
         # What regions to consider for a max scaling
         query_regions:
@@ -239,19 +252,18 @@ postprocessing:
     # summarizes values by region
     bwtools_query:
         # Can specify different "models" to run by naming them here
-        # Model 1 - look at the full coverage for all genes
         all_genes_cov:
             # which regions to use? Specifying a file like this has the pipeline
             # parse it from your genbank file given the process genbank
             # parameters above in the alignment section
-            regions: "results/alignment/process_genbank/ZM4/CP023715.1.bed"
+            regions: "results/alignment/process_genbank/ZM4_and_bsub/CP023715.1.bed"
             # which files to use? This file signature will substitute in
             # a sample name for the %s
             filesignature: "results/coverage_and_norm/bwtools_compare/%s_median_ratio.bw"
             # how many bp upstream (5') of a feature to include
-            upstream: 0
+            upstream: 500
             # how many bp downstream (3') of a feature to include
-            downstream: 0
+            downstream: 50
             # what resolution to query data (shouldn't be lower than the
             # resolution of your file
             res : 5
@@ -262,12 +274,34 @@ postprocessing:
             # for summarize "identity". Try to do this on a small number of
             # samples of the same type
             calc_spearman: true
-        # Model 2 - look at the coverage for all genes as a mean summary
+        all_beta_spike_cov:
+            filter: 'protein_of_interest == "beta"'
+            # which regions to use? Specifying a file like this has the pipeline
+            # parse it from your genbank file given the process genbank
+            # parameters above in the alignment section
+            regions: "results/alignment/process_genbank/ZM4_and_bsub/CP023715.1.bed"
+            # which files to use? This file signature will substitute in
+            # a sample name for the %s
+            filesignature: "results/coverage_and_norm/deeptools_coverage/%s_spike.bw"
+            # how many bp upstream (5') of a feature to include
+            upstream: 500
+            # how many bp downstream (3') of a feature to include
+            downstream: 50
+            # what resolution to query data (shouldn't be lower than the
+            # resolution of your file
+            res : 5
+            # How do you want to summarize your data? (identity gives every data
+            # point in tidy format)
+            summarize: "identity"
+            # Calculate spearman correlations between samples? Only make sense
+            # for summarize "identity". Try to do this on a small number of
+            # samples of the same type
+            calc_spearman: true
         all_genes_mean:
             # which regions to use?
-            regions: "results/alignment/process_genbank/ZM4/CP023715.1.bed"
+            regions: "results/alignment/process_genbank/ZM4_and_bsub/CP023715.1.bed"
             # which files to use? Note we can use a different set than Model 1
-            filesignature: "results/coverage_and_norm/bwtools_compare/%s_median_ratio_querysub_queryscale.bw"
+            filesignature: "results/coverage_and_norm/deeptools_coverage/%s_BPM.bw"
             # what resolution to query data (shouldn't be lower than the
             # resolution of your file, think of this as a sampling rate, no 
             # averaging is done over the bins)
@@ -281,38 +315,146 @@ postprocessing:
             summary_func: "mean"
             # what fraction of NaNs can be in a region and still report a value?
             frac_na: 0.20
-
-        # Model 3 - look at the relative polymerase progression for samples in
-        # genotype A
-        genotypeA_all_genes_RPP:
-            # only consider the samples that have a genotype A. Ensure that they
-            # have an associated input sample so that the input samples
-            # themselves are not run.
-            filter: 'genotype == "IPTG" and not input_sample.isnull()'
+        all_genes_center_mean:
             # which regions to use?
-            regions: "results/alignment/process_genbank/ZM4/CP023715.1.bed"
-            # which files to use?
-            filesignature: "results/coverage_and_norm/bwtools_compare/%s_median_ratio_querysub_queryscale.bw"
+            regions: "resources/beds/CP023715.1.center.bed"
+            # which files to use? Note we can use a different set than Model 1
+            filesignature: "results/coverage_and_norm/deeptools_coverage/%s_BPM.bw"
             # what resolution to query data (shouldn't be lower than the
-            # resolution of your file
+            # resolution of your file, think of this as a sampling rate, no
+            # averaging is done over the bins)
             res : 5
             # How do you want to summarize your data? (identity gives every data
             # point in tidy format, single allows for a single number summary)
             summarize: "single"
-            # What single number summary do you want (mean, median, max, min)
+            # What single number summary do you want (mean, median, max, min,
+            # etc.)
             # only defined when summarize is "single"
-            summary_func: "RPP"
+            summary_func: "mean"
             # what fraction of NaNs can be in a region and still report a value?
             frac_na: 0.20
-        
-        # Model 4 - look at the traveling ratio for samples in genotype A
-        genotypeA_all_genes_TR:
-            # only consider the samples that have a genotype A
-            filter: 'genotype == "IPTG" and not input_sample.isnull()'
+        all_genes_mean_beta_spike:
+            filter: 'protein_of_interest == "beta"'
             # which regions to use?
-            regions: "results/alignment/process_genbank/ZM4/CP023715.1.bed"
+            regions: "results/alignment/process_genbank/ZM4_and_bsub/CP023715.1.bed"
+            # which files to use? Note we can use a different set than Model 1 
+            filesignature: "results/coverage_and_norm/deeptools_coverage/%s_spike.bw"
+            # what resolution to query data (shouldn't be lower than the
+            # resolution of your file, think of this as a sampling rate, no
+            # averaging is done over the bins)
+            res : 5
+            # How do you want to summarize your data? (identity gives every data
+            # point in tidy format, single allows for a single number summary)
+            summarize: "single"
+            # What single number summary do you want (mean, median, max, min,
+            # etc.)
+            # only defined when summarize is "single"
+            summary_func: "mean"
+            # what fraction of NaNs can be in a region and still report a value?
+            frac_na: 0.20
+        all_genes_center_mean_beta_spike:
+            filter: 'protein_of_interest == "beta"'
+            # which regions to use?
+            regions: "resources/beds/CP023715.1.center.bed"
+            # which files to use? Note we can use a different set than Model 1
+            filesignature: "results/coverage_and_norm/deeptools_coverage/%s_spike.bw"
+            # what resolution to query data (shouldn't be lower than the
+            # resolution of your file, think of this as a sampling rate, no
+            # averaging is done over the bins)
+            res : 5
+            # How do you want to summarize your data? (identity gives every data
+            # point in tidy format, single allows for a single number summary)
+            summarize: "single"
+            # What single number summary do you want (mean, median, max, min,
+            # etc.)
+            # only defined when summarize is "single"
+            summary_func: "mean"
+            # what fraction of NaNs can be in a region and still report a value?
+            frac_na: 0.20
+        all_tss_cov:
+            # which regions to use? Specifying a file like this has the pipeline
+            # parse it from your genbank file given the process genbank
+            # parameters above in the alignment section
+            regions: "resources/beds/tss_promoter_data.bed"
+            # which files to use? This file signature will substitute in
+            # a sample name for the %s
+            filesignature: "results/coverage_and_norm/bwtools_compare/%s_median_ratio.bw"
+            # how many bp upstream (5') of a feature to include
+            upstream: 100
+            # how many bp downstream (3') of a feature to include
+            downstream: 10
+            # what resolution to query data (shouldn't be lower than the
+            # resolution of your file
+            res : 5
+            # How do you want to summarize your data? (identity gives every data
+            # point in tidy format)
+            summarize: "identity"
+            # Calculate spearman correlations between samples? Only make sense
+            # for summarize "identity". Try to do this on a small number of
+            # samples of the same type
+            calc_spearman: true
+        all_tss_mean:
+            # which regions to use?
+            regions: "resources/beds/tss.bed"
+            # which files to use? Note we can use a different set than Model 1
+            filesignature: "results/coverage_and_norm/deeptools_coverage/%s_spike.bw"
+            # what resolution to query data (shouldn't be lower than the
+            # resolution of your file, think of this as a sampling rate, no
+            # averaging is done over the bins)
+            res : 5
+            # How do you want to summarize your data? (identity gives every data
+            # point in tidy format, single allows for a single number summary)
+            summarize: "single"
+            # What single number summary do you want (mean, median, max, min,
+            # etc.)
+            # only defined when summarize is "single"
+            summary_func: "mean"
+            # what fraction of NaNs can be in a region and still report a value?
+            frac_na: 0.20
+        all_promoters_mean_beta_spike:
+            filter: 'protein_of_interest == "beta"'
+            # which regions to use?
+            regions: "resources/beds/tss_promoter_data.bed"
+            # which files to use? Note we can use a different set than Model 1
+            filesignature: "results/coverage_and_norm/deeptools_coverage/%s_spike.bw"
+            # what resolution to query data (shouldn't be lower than the
+            # resolution of your file, think of this as a sampling rate, no
+            # averaging is done over the bins)
+            res : 5
+            # How do you want to summarize your data? (identity gives every data
+            # point in tidy format, single allows for a single number summary)
+            summarize: "single"
+            # What single number summary do you want (mean, median, max, min,
+            # etc.)
+            # only defined when summarize is "single"
+            summary_func: "mean"
+            # what fraction of NaNs can be in a region and still report a value?
+            frac_na: 0.20
+        all_promoters_mean_CarD_spike:
+            filter: 'protein_of_interest == "CarD"'
+            # which regions to use?
+            regions: "resources/beds/tss_promoter_data.bed"
+            # which files to use? Note we can use a different set than Model 1
+            filesignature: "results/coverage_and_norm/deeptools_coverage/%s_BPM.bw"
+            # what resolution to query data (shouldn't be lower than the
+            # resolution of your file, think of this as a sampling rate, no
+            # averaging is done over the bins)
+            res : 5
+            # How do you want to summarize your data? (identity gives every data
+            # point in tidy format, single allows for a single number summary)
+            summarize: "single"
+            # What single number summary do you want (mean, median, max, min,
+            # etc.)
+            # only defined when summarize is "single"
+            summary_func: "mean"
+            # what fraction of NaNs can be in a region and still report a value?
+            frac_na: 0.20
+        beta_all_genes_TR:
+            filter: 'protein_of_interest == "beta"'
+            # which regions to use?
+            regions: "results/alignment/process_genbank/ZM4_and_bsub/CP023715.1.bed"
             # which files to use?
-            filesignature: "results/coverage_and_norm/deeptools_coverage/%s_raw.bw"
+            filesignature: "results/coverage_and_norm/deeptools_coverage/%s_BPM.bw"
             # Here we want to consider 300 bp upstream in our region as well
             upstream: 300
             # what resolution to query data (shouldn't be lower than the
@@ -326,27 +468,97 @@ postprocessing:
             summary_func: "TR"
             # what fraction of NaNs can be in a region and still report a value?
             frac_na: 0.20
-
-        # Model 5 - look at the identified beta peak locations for the traveling
-        # ratio
-        genotypeA_all_genes_TR:
-            # only consider the samples that have a genotype A
-            filter: 'genotype == "IPTG" and not input_sample.isnull()'
+        beta_all_genes_summit_loc:
+            filter: 'protein_of_interest == "beta"'
             # which regions to use?
-            regions: "results/alignment/process_genbank/ZM4/CP023715.1.bed"
+            regions: "results/alignment/process_genbank/ZM4_and_bsub/CP023715.1.bed"
             # which files to use?
-            filesignature: "results/coverage_and_norm/deeptools_coverage/%s_raw.bw"
+            filesignature: "results/coverage_and_norm/deeptools_coverage/%s_BPM.bw"
             # Here we want to consider 300 bp upstream in our region as well
-            upstream: 300
+            upstream: 300  
             # what resolution to query data (shouldn't be lower than the
             # resolution of your file
             res : 5
-            # How do you want to summarize your data? (identity gives every data
+            # How do you want to summarize your data? (identity gives every data   
+            # point in tidy format, single allows for a single number summary)
+            summarize: "single"
+            # What single number summary do you want (mean, median, max, min)
+            # only defined when summarize is "single"
+            summary_func: "summit_loc"
+            # what fraction of NaNs can be in a region and still report a value?
+            frac_na: 0.20
+        CarD_all_genes_TR:
+            filter: 'protein_of_interest == "CarD"'
+            # which regions to use?
+            regions: "results/alignment/process_genbank/ZM4_and_bsub/CP023715.1.bed"
+            # which files to use?
+            filesignature: "results/coverage_and_norm/deeptools_coverage/%s_BPM.bw"
+            # Here we want to consider 300 bp upstream in our region as well
+            upstream: 300  
+            # what resolution to query data (shouldn't be lower than the
+            # resolution of your file
+            res : 5
+            # How do you want to summarize your data? (identity gives every data   
             # point in tidy format, single allows for a single number summary)
             summarize: "single"
             # What single number summary do you want (mean, median, max, min)
             # only defined when summarize is "single"
             summary_func: "TR"
+            # what fraction of NaNs can be in a region and still report a value?
+            frac_na: 0.20
+        beta_spike_all_genes_TR:
+            filter: 'protein_of_interest == "beta"'
+            # which regions to use?
+            regions: "results/alignment/process_genbank/ZM4_and_bsub/CP023715.1.bed"
+            # which files to use?
+            filesignature: "results/coverage_and_norm/deeptools_coverage/%s_spike.bw"
+            # Here we want to consider 300 bp upstream in our region as well
+            upstream: 300
+            # what resolution to query data (shouldn't be lower than the
+            # resolution of your file
+            res : 5
+            # How do you want to summarize your data? (identity gives every data   
+            # point in tidy format, single allows for a single number summary)
+            summarize: "single"
+            # What single number summary do you want (mean, median, max, min)
+            # only defined when summarize is "single"
+            summary_func: "TR"
+            # what fraction of NaNs can be in a region and still report a value?   
+            frac_na: 0.20
+        rand_seq_means:
+            # which regions to use?
+            regions: "resources/beds/ZM4_promoter_sites_rand.bed"
+            # which files to use? Note we can use a different set than Model 1
+            filesignature: "results/coverage_and_norm/deeptools_coverage/%s_BPM.bw"
+            # what resolution to query data (shouldn't be lower than the
+            # resolution of your file, think of this as a sampling rate, no
+            # averaging is done over the bins)
+            res : 5
+            # How do you want to summarize your data? (identity gives every data
+            # point in tidy format, single allows for a single number summary)
+            summarize: "single"
+            # What single number summary do you want (mean, median, max, min,
+            # etc.)
+            # only defined when summarize is "single"
+            summary_func: "mean"
+            # what fraction of NaNs can be in a region and still report a value?
+            frac_na: 0.20
+        promoter_seq_means:
+            # which regions to use?
+            regions: "resources/beds/ZM4_promoter_sites_true.bed"
+            # which files to use? Note we can use a different set than Model 1
+            filesignature: "results/coverage_and_norm/deeptools_coverage/%s_BPM.bw"
+            # what resolution to query data (shouldn't be lower than the
+            # resolution of your file, think of this as a sampling rate, no
+            # averaging is done over the bins)
+            res : 5
+            # How do you want to summarize your data? (identity gives every data
+            # point in tidy format, single allows for a single number summary)
+            summarize: "single"
+            # What single number summary do you want (mean, median, max, min,
+            # etc.)
+            # only defined when summarize is "single"
+            summary_func: "mean"
             # what fraction of NaNs can be in a region and still report a value?
             frac_na: 0.20
 
